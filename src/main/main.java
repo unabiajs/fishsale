@@ -1,0 +1,236 @@
+package main;
+
+import java.util.Scanner;
+import java.util.List;
+import java.util.Map;
+import config.config;
+
+public class main {
+
+    Scanner sc = new Scanner(System.in);
+    config conf = new config();
+    FishManager fishManager;
+    SaleManager saleManager;
+    PaymentManager paymentManager;
+
+    public static void main(String[] args) {
+        main system = new main();
+        system.system();
+    }
+
+    public main() {
+        fishManager = new FishManager(conf, sc);
+        saleManager = new SaleManager(conf, sc, fishManager);
+        paymentManager = new PaymentManager(conf, sc);
+    }
+
+    public void system() {
+        int choice;
+
+        do {
+            System.out.println("\n===== FISHSale Tracker =====");
+            System.out.println("1. Login");
+            System.out.println("2. Register");
+            System.out.println("3. Exit");
+            System.out.print("Enter choice: ");
+            choice = readIntSafe();
+
+            switch (choice) {
+                case 1:
+                    loginFlow();
+                    break;
+
+                case 2:
+                    registerFlow();
+                    break;
+
+                case 3:
+                    System.out.println("👋 Exiting... Goodbye!");
+                    break;
+
+                default:
+                    System.out.println("Invalid choice.");
+            }
+        } while (choice != 3);
+
+        sc.close();
+    }
+
+    private void loginFlow() {
+        System.out.print("Enter email: ");
+        String email = sc.nextLine();
+        System.out.print("Enter password: ");
+        String pass = sc.nextLine();
+
+        String hashpass = conf.hashPassword(pass);
+
+        List<Map<String, Object>> result = conf.fetchRecords("SELECT * FROM tbl_user WHERE u_email=? AND u_pass=?", email, hashpass);
+
+        if (result.isEmpty()) {
+            System.out.println("❌ Invalid Credentials!");
+            return;
+        }
+
+        Map<String, Object> user = result.get(0);
+        String status = user.get("u_status").toString();
+        String type = user.get("u_type").toString();
+        String uname = user.get("u_name").toString();
+        int uid = Integer.parseInt(user.get("u_id").toString());
+
+        if (status.equalsIgnoreCase("Pending")) {
+            System.out.println("⚠️ Account is still pending approval. Contact Admin.");
+            return;
+        } else {
+            System.out.println("✅ Login Successful! Welcome, " + uname);
+
+            if (type.equalsIgnoreCase("Admin")) {
+                adminDash(uid);
+            } else {
+                staffDash(uid);
+            }
+        }
+    }
+
+    private void registerFlow() {
+        System.out.print("Enter Name: ");
+        String name = sc.nextLine();
+        System.out.print("Enter Email: ");
+        String regEmail = sc.nextLine();
+
+        // Check existing email
+        List<Map<String, Object>> chkResult = conf.fetchRecords("SELECT * FROM tbl_user WHERE u_email=?", regEmail);
+        while (!chkResult.isEmpty()) {
+            System.out.print("⚠️ Email already exists. Enter another: ");
+            regEmail = sc.nextLine();
+            chkResult = conf.fetchRecords("SELECT * FROM tbl_user WHERE u_email=?", regEmail);
+        }
+
+        System.out.print("Enter Password: ");
+        String regPass = sc.nextLine();
+        String hashedpass = conf.hashPassword(regPass);
+
+        int tp;
+        while (true) {
+            System.out.print("Enter User Type (1 - Admin / 2 - Staff): ");
+            tp = readIntSafe();
+            if (tp == 1 || tp == 2) break;
+            System.out.println("Invalid input. Enter 1 or 2.");
+        }
+
+        String status, utype = "";
+        if (tp == 1) {
+            utype = "Admin";
+            status = "Active";
+        } else {
+            utype = "Staff";
+            status = "Pending";
+        }
+
+        String sql = "INSERT INTO tbl_user (u_name, u_email, u_type, u_status, u_pass) VALUES (?,?,?,?,?)";
+        conf.addRecord(sql, name, regEmail, utype, status, hashedpass);
+    }
+
+    public void adminDash(int adminId) {
+        int resp;
+        do {
+            System.out.println("\n🔹 Admin Dashboard");
+            System.out.println("1. View Accounts");
+            System.out.println("2. Approve an Account");
+            System.out.println("3. Delete Account");
+            System.out.println("4. Manage Fish");
+            System.out.println("5. View Sales");
+            System.out.println("6. Logout Account");
+            System.out.print("Enter Choice: ");
+            resp = readIntSafe();
+
+            switch (resp) {
+                case 1:
+                    viewAcc();
+                    break;
+                case 2:
+                    viewAcc();
+                    appAcc();
+                    break;
+                case 3:
+                    delAcc();
+                    break;
+                case 4:
+                    fishManager.showMenu(adminId, true); // admin allowed full CRUD
+                    break;
+                case 5:
+                    saleManager.viewAllSales();
+                    break;
+                case 6:
+                    System.out.println("Logging out your account!");
+                    break;
+                default:
+                    System.out.println("Invalid Choice! Try again!");
+                    break;
+            }
+        } while (resp != 6);
+    }
+
+    public void staffDash(int uid) {
+        int resp;
+        do {
+            System.out.println("\n🔹 Staff Dashboard");
+            System.out.println("1. View Fish");
+            System.out.println("2. Create Sale");
+            System.out.println("3. Make Payment");
+            System.out.println("4. Logout");
+            System.out.print("Enter Choice: ");
+            resp = readIntSafe();
+
+            switch (resp) {
+                case 1:
+                    fishManager.showMenu(uid, false); // staff view only (2 = back)
+                    break;
+                case 2:
+                    saleManager.createSale(uid);
+                    break;
+                case 3:
+                    paymentManager.showMenu();
+                    break;
+                case 4:
+                    System.out.println("Logging out!");
+                    break;
+                default:
+                    System.out.println("Invalid choice!");
+            }
+        } while (resp != 4);
+    }
+
+    public void viewAcc() {
+        String sql = "SELECT * FROM tbl_user";
+        String[] userHeaders = {"ID", "Name", "Email", "Role", "Status"};
+        String[] userColumns = {"u_id", "u_name", "u_email", "u_type", "u_status"};
+        conf.viewRecords(sql, userHeaders, userColumns);
+    }
+
+    public void appAcc() {
+        System.out.print("Enter Email to Approve: ");
+        String approveEmail = sc.nextLine();
+        String sql = "UPDATE tbl_user SET u_status=? WHERE u_email=?";
+        conf.updateRecord(sql, "Active", approveEmail);
+        System.out.println("✅ User approved successfully!");
+    }
+
+    public void delAcc() {
+        System.out.print("Enter ID to delete: ");
+        int id = readIntSafe();
+
+        String sql = "DELETE FROM tbl_user WHERE u_id = ?";
+        conf.deleteRecord(sql, id);
+    }
+
+    private int readIntSafe() {
+        while (true) {
+            String line = sc.nextLine();
+            try {
+                return Integer.parseInt(line.trim());
+            } catch (NumberFormatException e) {
+                System.out.print("Please enter a valid number: ");
+            }
+        }
+    }
+}
