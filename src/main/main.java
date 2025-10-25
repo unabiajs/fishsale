@@ -97,7 +97,6 @@ public class main {
         System.out.print("Enter Email: ");
         String regEmail = sc.nextLine();
 
-        // Check existing email
         List<Map<String, Object>> chkResult = conf.fetchRecords("SELECT * FROM tbl_user WHERE u_email=?", regEmail);
         while (!chkResult.isEmpty()) {
             System.out.print("⚠️ Email already exists. Enter another: ");
@@ -133,7 +132,7 @@ public class main {
     public void adminDash(int adminId) {
         int resp;
         do {
-            System.out.println("\n🔹 Admin Dashboard");
+            System.out.println("\n Admin Dashboard");
             System.out.println("1. View Accounts");
             System.out.println("2. Approve an Account");
             System.out.println("3. Delete Account");
@@ -155,7 +154,7 @@ public class main {
                     delAcc();
                     break;
                 case 4:
-                    fishManager.showMenu(adminId, true); // admin allowed full CRUD
+                    fishManager.showMenu(adminId, true); 
                     break;
                 case 5:
                     saleManager.viewAllSales();
@@ -183,7 +182,7 @@ public class main {
 
             switch (resp) {
                 case 1:
-                    fishManager.showMenu(uid, false); // staff view only (2 = back)
+                    fishManager.showMenu(uid, false); 
                     break;
                 case 2:
                     saleManager.createSale(uid);
