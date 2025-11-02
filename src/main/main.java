@@ -97,6 +97,7 @@ public class main {
         System.out.print("Enter Email: ");
         String regEmail = sc.nextLine();
 
+        
         List<Map<String, Object>> chkResult = conf.fetchRecords("SELECT * FROM tbl_user WHERE u_email=?", regEmail);
         while (!chkResult.isEmpty()) {
             System.out.print("⚠️ Email already exists. Enter another: ");
@@ -119,20 +120,33 @@ public class main {
         String status, utype = "";
         if (tp == 1) {
             utype = "Admin";
-            status = "Active";
-        } else {
-            utype = "Staff";
-            status = "Pending";
-        }
+             String checkAdmin = "SELECT * FROM tbl_user WHERE u_type = ?";
+            java.util.List<java.util.Map<String, Object>> adminCheck = conf.fetchRecords(checkAdmin, "Admin");
+
+            if (adminCheck.isEmpty()) {
+                status = "Approved"; 
+            } else {
+                status = "Pending";   
+            }
+
+        String sql = "INSERT INTO tbl_user (u_name, u_email, u_type, u_status, u_pass) VALUES (?,?,?,?,?)";
+        conf.addRecord(sql, name, regEmail, utype, status, hashedpass);
+    }    
+    else if (tp == 2) {  
+        utype = "Staff";
+        status = "Pending";
 
         String sql = "INSERT INTO tbl_user (u_name, u_email, u_type, u_status, u_pass) VALUES (?,?,?,?,?)";
         conf.addRecord(sql, name, regEmail, utype, status, hashedpass);
     }
 
+      
+
+}
     public void adminDash(int adminId) {
         int resp;
         do {
-            System.out.println("\n Admin Dashboard");
+            System.out.println("\n🔹 Admin Dashboard");
             System.out.println("1. View Accounts");
             System.out.println("2. Approve an Account");
             System.out.println("3. Delete Account");
