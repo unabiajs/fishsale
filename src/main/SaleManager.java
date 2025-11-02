@@ -15,6 +15,7 @@ public class SaleManager {
         this.fishManager = fm;
     }
 
+    // show summary of all sales
     public void viewAllSales() {
         String sql = "SELECT * FROM tbl_sale";
         String[] headers = {"SaleID", "UserID", "Status", "Date", "Total"};

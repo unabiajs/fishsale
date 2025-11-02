@@ -128,6 +128,7 @@ public class main {
             } else {
                 status = "Pending";   
             }
+<<<<<<< HEAD
 
         String sql = "INSERT INTO tbl_user (u_name, u_email, u_type, u_status, u_pass) VALUES (?,?,?,?,?)";
         conf.addRecord(sql, name, regEmail, utype, status, hashedpass);
@@ -135,13 +136,18 @@ public class main {
     else if (tp == 2) {  
         utype = "Staff";
         status = "Pending";
+=======
+>>>>>>> 5a585316ad17a62559cb3843d545337d477242b1
 
         String sql = "INSERT INTO tbl_user (u_name, u_email, u_type, u_status, u_pass) VALUES (?,?,?,?,?)";
         conf.addRecord(sql, name, regEmail, utype, status, hashedpass);
     }
+<<<<<<< HEAD
 
       
 
+=======
+>>>>>>> 5a585316ad17a62559cb3843d545337d477242b1
 }
     public void adminDash(int adminId) {
         int resp;
