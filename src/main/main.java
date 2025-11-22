@@ -48,7 +48,7 @@ public class main {
                     break;
 
                 case 3:
-                    System.out.println("👋 Exiting... Goodbye!");
+                    System.out.println(" Exiting... Goodbye!");
                     break;
 
                 default:
@@ -81,15 +81,18 @@ public class main {
         int uid = Integer.parseInt(user.get("u_id").toString());
 
         if (status.equalsIgnoreCase("Pending")) {
-            System.out.println("⚠️ Account is still pending approval. Contact Admin.");
-            return;
+            System.out.println(" Account is still pending approval. Contact Admin.");
         } else {
-            System.out.println("✅ Login Successful! Welcome, " + uname);
+            System.out.println(" Login Successful! Welcome, " + uname);
 
             if (type.equalsIgnoreCase("Admin")) {
                 adminDash(uid);
             } else {
+<<<<<<< HEAD
                 costumerDash(uid);
+=======
+                costumersDash(uid);
+>>>>>>> 56c11089707bdcbaa719fc0d6f5b560c72eacc05
             }
         }
     }
@@ -103,7 +106,7 @@ public class main {
         
         List<Map<String, Object>> chkResult = conf.fetchRecords("SELECT * FROM tbl_user WHERE u_email=?", regEmail);
         while (!chkResult.isEmpty()) {
-            System.out.print("⚠️ Email already exists. Enter another: ");
+            System.out.print(" Email already exists. Enter another: ");
             regEmail = sc.nextLine();
             chkResult = conf.fetchRecords("SELECT * FROM tbl_user WHERE u_email=?", regEmail);
         }
@@ -114,7 +117,11 @@ public class main {
 
         int tp;
         while (true) {
+<<<<<<< HEAD
             System.out.print("Enter User Type (1 - Admin / 2 - Costumer): ");
+=======
+            System.out.print("Enter User Type (1 - Admin / 2 - Costumers): ");
+>>>>>>> 56c11089707bdcbaa719fc0d6f5b560c72eacc05
             tp = readIntSafe();
             if (tp == 1 || tp == 2) break;
             System.out.println("Invalid input. Enter 1 or 2.");
@@ -136,15 +143,16 @@ public class main {
         conf.addRecord(sql, name, regEmail, utype, status, hashedpass);
     }    
     else if (tp == 2) {  
+<<<<<<< HEAD
         utype = "Costumer";
+=======
+        utype = "Costumers";
+>>>>>>> 56c11089707bdcbaa719fc0d6f5b560c72eacc05
         status = "Pending";
 
         String sql = "INSERT INTO tbl_user (u_name, u_email, u_type, u_status, u_pass) VALUES (?,?,?,?,?)";
         conf.addRecord(sql, name, regEmail, utype, status, hashedpass);
     }
-
-      
-
 }
     public void adminDash(int adminId) {
         int resp;
@@ -189,7 +197,11 @@ public class main {
         } while (resp != 7);
     }
 
+<<<<<<< HEAD
     public void costumerDash(int uid) {
+=======
+    public void costumersDash(int uid) {
+>>>>>>> 56c11089707bdcbaa719fc0d6f5b560c72eacc05
         int resp;
         do {
             System.out.println("\n🔹 Costumer Dashboard");
@@ -231,7 +243,7 @@ public class main {
         String approveEmail = sc.nextLine();
         String sql = "UPDATE tbl_user SET u_status=? WHERE u_email=?";
         conf.updateRecord(sql, "Active", approveEmail);
-        System.out.println("✅ User approved successfully!");
+        System.out.println(" User approved successfully!");
     }
 
     public void delAcc() {

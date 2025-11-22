@@ -15,6 +15,7 @@ public class FishManager {
         this.sc = sc;
     }
 
+    // show menu - adminFull true -> allow add/edit/delete
     public void showMenu(int userId, boolean adminFull) {
         int choice = -1;
         do {
