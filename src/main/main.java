@@ -11,6 +11,7 @@ public class main {
     config conf = new config();
     FishManager fishManager;
     SaleManager saleManager;
+    SaleDetailManager saleDetailManager;
     PaymentManager paymentManager;
 
     public static void main(String[] args) {
@@ -22,6 +23,8 @@ public class main {
         fishManager = new FishManager(conf, sc);
         saleManager = new SaleManager(conf, sc, fishManager);
         paymentManager = new PaymentManager(conf, sc);
+        saleDetailManager = new SaleDetailManager(conf, sc);
+
     }
 
     public void system() {
@@ -86,7 +89,7 @@ public class main {
             if (type.equalsIgnoreCase("Admin")) {
                 adminDash(uid);
             } else {
-                staffDash(uid);
+                costumerDash(uid);
             }
         }
     }
@@ -111,7 +114,7 @@ public class main {
 
         int tp;
         while (true) {
-            System.out.print("Enter User Type (1 - Admin / 2 - Staff): ");
+            System.out.print("Enter User Type (1 - Admin / 2 - Costumer): ");
             tp = readIntSafe();
             if (tp == 1 || tp == 2) break;
             System.out.println("Invalid input. Enter 1 or 2.");
@@ -133,7 +136,7 @@ public class main {
         conf.addRecord(sql, name, regEmail, utype, status, hashedpass);
     }    
     else if (tp == 2) {  
-        utype = "Staff";
+        utype = "Costumer";
         status = "Pending";
 
         String sql = "INSERT INTO tbl_user (u_name, u_email, u_type, u_status, u_pass) VALUES (?,?,?,?,?)";
@@ -152,8 +155,10 @@ public class main {
             System.out.println("3. Delete Account");
             System.out.println("4. Manage Fish");
             System.out.println("5. View Sales");
-            System.out.println("6. Logout Account");
-            System.out.print("Enter Choice: ");
+            System.out.println("6. View Sale Details");
+            System.out.println("7. Logout Account");
+            
+    
             resp = readIntSafe();
 
             switch (resp) {
@@ -174,19 +179,20 @@ public class main {
                     saleManager.viewAllSales();
                     break;
                 case 6:
+                    saleDetailManager.viewDetailsBySaleId();
+                    break;
+                case 7:
                     System.out.println("Logging out your account!");
                     break;
-                default:
-                    System.out.println("Invalid Choice! Try again!");
-                    break;
+
             }
-        } while (resp != 6);
+        } while (resp != 7);
     }
 
-    public void staffDash(int uid) {
+    public void costumerDash(int uid) {
         int resp;
         do {
-            System.out.println("\n🔹 Staff Dashboard");
+            System.out.println("\n🔹 Costumer Dashboard");
             System.out.println("1. View Fish");
             System.out.println("2. Create Sale");
             System.out.println("3. Make Payment");
